@@ -20,7 +20,7 @@ module.exports = function(core, config, store) {
 	lastGCMTime = lastGCMTime ? parseInt(lastGCMTime, 10) : 0;
 
 	function addGcmData() {
-		if (!device || !initUserObject || !initUserCallback) return;
+		if(!device || !initUserObject || !initUserCallback) return;
 
 		var userObj = store.getUser(), uuid, key = "";
 		if (!userObj.id || userUtils.isGuest(userObj.id)) return;
