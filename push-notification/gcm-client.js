@@ -10,8 +10,8 @@ var gcmTimeValidity = 12 * 60 * 60 * 1000,
 module.exports = function(core, config, store) {
 	var LS = window.localStorage,
 		lastGCMTime, device,
-		initUserObject,
-		initUserCallback,
+		userObject,
+		userCallback,
 		defaultPackageName;
 
 	defaultPackageName = config.pushNotification.defaultPackageName || "";
@@ -20,36 +20,37 @@ module.exports = function(core, config, store) {
 	lastGCMTime = lastGCMTime ? parseInt(lastGCMTime, 10) : 0;
 
 	function addGcmData() {
-		if(!device || !initUserObject || !initUserCallback) return;
+		if (!device) {
+			userCallback();
+			userCallback = null;
+			return;
+		}
+		if (!userObject) return;
 
 		var userObj = store.getUser(), uuid, key = "";
 		if (!userObj.id || userUtils.isGuest(userObj.id)) return;
 
-		var pushNot = userObj.params.pushNotification;
+		var pushNotification = userObj.params.pushNotification;
 
-//		if (device[deviceId] === pushNot.devices[deviceId]) {
-//			initUserCallback();
-//			return;
-//		}
-
-		initUserObject.params = initUserObject.params || {};
-		initUserObject.params.pushNotifications = initUserObject.params.pushNotifications || pushNot || {};
-		initUserObject.params.pushNotifications.devices = initUserObject.params.pushNotifications.devices || [];
-
-//		initUserObject.params.pushNotifications.devices.push(gcmDevObject);
+		userObject.params = userObject.params || {};
+		userObject.params.pushNotifications = userObject.params.pushNotifications || pushNotification || {};
+		userObject.params.pushNotifications.devices = userObject.params.pushNotifications.devices || {};
 
 		device.expiryTime = new Date().getTime() + gcmTimeValidity;
 		uuid = device.uuid;
 
 		device.platform = "android";
 		key = device.uuid + (device.packageName && device.packageName !== defaultPackageName ? ("_" + device.packageName) : "");
-		initUserObject.params.pushNotifications.devices[key] = device;
+		userObject.params.pushNotifications.devices[key] = device;
 		device.enabled = true;
 
 		LS.setItem("lastGCMTime", new Date().getTime());
 		LS.setItem("currentDevice", uuid);
 		updateDevice = false;
-		initUserCallback();
+
+		if (userCallback) userCallback();
+		else return;
+//		userCallback = null;
 	}
 
 	core.on("boot", function(state, next) {
@@ -77,8 +78,12 @@ module.exports = function(core, config, store) {
 	}, 100);
 
 	core.on("init-user-up", function(payload, next) {
-		initUserObject = payload;
-		initUserCallback = next;
+		if (store.get("context").env === "web") {
+			return next();
+//			return;
+		}
+		userObject = payload;
+		userCallback = next;
 		addGcmData();
 	});
 
@@ -112,7 +117,7 @@ module.exports = function(core, config, store) {
 //			LS.setItem("lastGCMTime", new Date().getTime());
 //			LS.setItem("currentDevice", uuid);
 //			updateDevice = false;
-//		});
+//		});});
 //	}
 
 	core.on("statechange", function(changes, next) {
