@@ -152,46 +152,12 @@ sock.on('connection', function(socket) {
 				}
 			}
 			if (data.type === 'init') {
-				if (data.old && data.old.id) {
-					log.i("Occupant of: ", data.occupantOf);
-					data.occupantOf.forEach(function(room) {
-						var role, cnt, l;
-						for (cnt = 0, l = data.memberOf.length; cnt < l; cnt++) {
-							if (data.memberOf[cnt].id === room.id) {
-								role = data.memberOf[cnt].role;
-								break;
-							}
-						}
-
-						data.user.role = role;
-						action = {
-							id: generate.uid(),
-							type: "back",
-							to: room.id,
-							from: data.user.id,
-							session: data.session,
-							user: data.user,
-							room: room
-						};
-						emit({
-							id: generate.uid(),
-							type: "away",
-							to: room.id,
-							from: data.old.id,
-							user: data.old,
-							room: room
-						});
-
-						if (conn.listeningTo && conn.listeningTo.indexOf(room.id) >= 0) {
-							if (verifyBack(conn, action)) emit(action);
-							storeBack(conn, action);
-						}
-
-					});
+				if(action.auth) {
+					// add the verified accounts info to the socket.
 				}
+				
 				storeInit(conn, data);
 			}
-			if (data.type === 'user') processUser(conn, data);
 			if (['getUsers', 'getTexts', 'getRooms', 'getThreads', 'getEntities', 'getNotes'].indexOf(data.type) >= 0) {
 				var t = data.eventStartTime; //TODO: copy properties of each query that is needed on client side.
 				delete data.eventStartTime;
@@ -242,46 +208,11 @@ sock.on('connection', function(socket) {
 	});
 });
 
-function processUser(conn, action) {
-	if (/^guest-/.test(action.from)) {
-		core.emit("init", {
-			time: new Date().getTime(),
-			to: 'me',
-			origin: conn.origin,
-			session: conn.session,
-			resource: conn.resource,
-			type: "init"
-		});
-
-		uConns[action.user.id] = uConns[action.from];
-		delete uConns[action.from];
-	}
-}
 
 function storeInit(conn, init) {
 	if (!uConns[init.user.id]) uConns[init.user.id] = [];
 	if (uConns[init.user.id].indexOf(conn) < 0) uConns[init.user.id].push(conn);
 	conn.user = init.user.id;
-	if (init.old && init.old.id) {
-		sConns[init.session].forEach(function(c) {
-			var index;
-			if (init.old.id !== init.user.id && uConns[init.old.id]) {
-				index = uConns[init.old.id].indexOf(c);
-				uConns[init.old.id].splice(index, 1);
-			}
-			init.occupantOf.forEach(function(room) {
-				if (urConns[init.old.id + ":" + room.id]) {
-					index = urConns[init.old.id + ":" + room.id].indexOf(c);
-					urConns[init.old.id + ":" + room.id].splice(index, 1);
-					if (c.listeningTo.indexOf(room) >= 0) {
-						if (!urConns[init.user.id + ":" + room.id]) urConns[init.user.id + ":" + room.id] = [];
-						if (urConns[init.user.id + ":" + room.id].indexOf(c) < 0) urConns[init.user.id + ":" + room.id].push(c);
-					}
-
-				}
-			});
-		});
-	}
 }
 
 function storeBack(conn, back) {

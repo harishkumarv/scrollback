@@ -115,15 +115,6 @@ module.exports = function(core) {
 				return;
 			}
 
-			if (userUtils.isGuest(info.entity)) {
-				cb(null, {
-					type: "url",
-					url: userFallbackAvatar
-				});
-
-				return;
-			}
-
 			cb(null);
 		});
 	}

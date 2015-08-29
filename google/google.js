@@ -68,7 +68,7 @@ module.exports = function(c, conf) {
 					}, function(e, data) {
 						if (e || !data) return callback(e);
 						if (!data.results.length) {
-							action.old = action.user;
+							action.old = action.user || {};
 							action.user = {};
 							action.user.id = action.old.id;
 							action.user.type = "user";

@@ -46,7 +46,6 @@ module.exports = function(core, conf) {
  	init(core);
 	
 	core.on("room", function(action, callback) {
-
 		if (action.room.params.http && typeof action.room.params.http.seo !== "boolean") return callback(new Error("ERR_INVAILD_PARAMS"));
 		callback();
 	}, 'appLevelValidation');

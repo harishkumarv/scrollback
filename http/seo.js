@@ -27,7 +27,7 @@ module.exports = function(core) {
 
 	function genTextHtml(res, roomid, threadid) {
 		var a = res.map(function(text) {
-				return "<p>" + format.textToHtml(text.from.replace(/^guest\-/, "") + ": " + text.text) + "</p>";
+				return "<p>" + format.textToHtml(text.from + ": " + text.text) + "</p>";
 			});
 
 		if (a.length > noOfText) {
