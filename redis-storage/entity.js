@@ -33,27 +33,6 @@ function onGetUsers(query, callback) {
 	}
 }
 
-function updateUser(action, callback) {
-	if (action.old && action.old.id !== action.user.id) {
-		occupantDB.smembers("user:{{" + action.old.id + "}}:occupantOf", function(error, data) {
-			data.forEach(function(room) {
-				occupantDB.srem("room:{{" + room + "}}:hasOccupants", action.old.id);
-				occupantDB.sadd("room:{{" + room + "}}:hasOccupants", action.user.id, function(err, res) {
-					if (err) log.d(err, res);
-				});
-			});
-		});
-		if (action.occupantOf && action.occupantOf.length) {
-			occupantDB.rename("user:{{" + action.old.id + "}}:occupantOf", "user:{{" + action.user.id + "}}:occupantOf", function(err) {
-				if (err) {
-					log.e("Redis user update problem:", err, JSON.stringify(action));
-				}
-			});
-		}
-
-	}
-	callback();
-}
 function onGetRooms(query, callback) {
 	if (query.hasOccupant) {
 		return occupantDB.smembers("user:{{" + query.hasOccupant + "}}:occupantOf", function(err, data) {
@@ -78,7 +57,6 @@ module.exports = function(c, conf) {
 	occupantDB.select(config.occupantsDB);
 	get = require("./get.js")(config);
 
-	core.on("init", updateUser, "storage");
 	core.on("getUsers", onGetUsers, "cache");
 	core.on("getRooms", onGetRooms, "cache");
 };
