@@ -52,16 +52,6 @@ module.exports = function(c, conf, s) {
 	core.on("init-dn", function(init, next) {
 		var entities = {};
 		init.occupantOf.forEach(function(roomObj) {
-			if(init.old && init.old.id){
-				if(userUtils.isGuest(init.old.id)) {
-					entities[init.old.id] = null;
-					entities[roomObj.id + "_" + init.old.id] = null;
-				}else {
-					entities[roomObj.id + "_" + init.old.id] = {
-						statue: "offline"
-					};
-				}
-			}
 			sendBack(roomObj.id);
 		});
 

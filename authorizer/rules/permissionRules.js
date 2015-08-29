@@ -12,7 +12,7 @@ module.exports = function() {
 			readLevel, writeLevel, moderatorLevel;
 
 		if (readActions.indexOf(action.type) > -1) {
-			readLevel = (guides && guides.authorizer && guides.authorizer.readLevel) ? guides.authorizer.readLevel : "guest";
+			readLevel = (guides && guides.authorizer && guides.authorizer.readLevel) ? guides.authorizer.readLevel : "registered";
 
 			if (permissionLevels[readLevel] > permissionLevels[action.user.role]) {
 				return (new SbError("ERR_NOT_ALLOWED", {
@@ -25,7 +25,7 @@ module.exports = function() {
 		}
 
 		if (writeActions.indexOf(action.type) > -1) {
-			writeLevel = (guides && guides.authorizer && guides.authorizer.writeLevel) ? guides.authorizer.writeLevel : "guest";
+			writeLevel = (guides && guides.authorizer && guides.authorizer.writeLevel) ? guides.authorizer.writeLevel : "registered";
 
 			if (permissionLevels[writeLevel] > permissionLevels[action.user.role]) {
 				return (new SbError("ERR_NOT_ALLOWED", {

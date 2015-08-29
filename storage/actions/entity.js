@@ -35,18 +35,6 @@ module.exports = function(action) {
 		terms: entity.id + " " + (entity.description || "")
 	};
 
-
-	if (action.type === 'user' || action.type === 'init' ) {
-		if (/^guest-/.test(action.user.id)) {
-			action.user.identities = action.user.identities || [];
-			if (action.user.identities.indexOf("guest:" + action.user.id) < 0) {
-				action.user.identities.push("guest:" + action.user.id);
-			}	
-			insertObject.id = insertObject.id.replace(/^guest-/, "");
-			insertObject.identities = action.user.identities;
-		}
-	}
-
 	insertObject.identities = insertObject.identities.map(function(ident) {
 		return [ident.split(':', 2)[0], ident];
 	});
@@ -75,14 +63,6 @@ module.exports = function(action) {
 		$: "WHERE NOT EXISTS (SELECT 1 FROM entities WHERE id = ${id})",
 		id: insertObject.id
 	}]));
-	
-	if(action.type === "user" && action.old && action.user.id !== action.old.id && userUtils.isGuest(action.old.id)) {
-		query.push({
-			$: "delete from entities where id=${oldId}",
-			oldId: action.old.id.replace(/^guest-/, "")
-		});
-	}
-
 	
 	if (action.type === "room" && (!action.old || !action.old.id)) {
 		query.push({

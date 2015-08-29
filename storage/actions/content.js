@@ -49,9 +49,7 @@ module.exports = function (action) {
 				tags: action.tags || [],
 				updatetime: new Date(action.time),
 				updater: action.from,
-				concerns: [action.from].concat(action.mentions).filter(function(id) {
-					return !userUtils.isGuest(id);
-				})
+				concerns: [action.from].concat(action.mentions)
 			}));
 
 		} else {
@@ -60,7 +58,7 @@ module.exports = function (action) {
 				{ $: "updater=${updater}", updater: action.from },
 				"length=length+1"
 			], concerns = [action.from].concat(action.mentions).filter(function(id) {
-				return !userUtils.isGuest(id) && action.threadObject && action.threadObject.concerns && action.threadObject.concerns.indexOf(id) === -1;
+				return action.threadObject && action.threadObject.concerns && action.threadObject.concerns.indexOf(id) === -1;
 			}).map(function(id) {
 				return [id];
 			});

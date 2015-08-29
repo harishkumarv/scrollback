@@ -54,8 +54,7 @@ module.exports = (core, config, store) => {
 
 	// Handle queuedActions
 	core.on("init-dn", init => {
-		// User signed in or signed up
-		if (init.user && !userUtils.isGuest(init.user.id)) {
+		if (init.user) {
 			let queuedActions = store.get("app", "queuedActions");
 
 			if (queuedActions && queuedActions.signup) {

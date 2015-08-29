@@ -24,15 +24,7 @@ function handleEntityAction(action, next) {
 
 
 function handlePresenseAction(action, next) {
-	var sql;
-	if (action.type === "away" && action.deleteGuestNow) {
-		sql = deleteEntity(action);
-		pg.write(connString, sql, function(err) {
-			next(err);
-		});
-	} else {
-		next();
-	}
+	next();
 }
 
 function handleRelationAction(action, next) {

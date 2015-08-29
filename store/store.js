@@ -255,7 +255,7 @@ Store.prototype.getUserRole = function(userId, roomId) {
 	if (rel && rel.role && rel.role !== "none") {
 		role = rel.role;
 	} else {
-		role = (!userId || userUtils.isGuest(userId)) ? "guest" : "registered";
+		role = "registered";
 	}
 
 	return role;
@@ -271,7 +271,7 @@ Store.prototype.isUserAdmin = function(userId, roomId) {
 	if (rel && rel.role && rel.role !== "none") {
 		role = rel.role;
 	} else {
-		role = (!userId || userUtils.isGuest(userId)) ? "guest" : "registered";
+		role = "registered";
 	}
 
 	return role;
@@ -280,7 +280,7 @@ Store.prototype.isUserAdmin = function(userId, roomId) {
 Store.prototype.isRoomReadable = function(roomId, userId) {
 	var roomObj = this.getRoom(roomId),
 		readLevel = (roomObj && roomObj.guides && roomObj.guides.authorizer &&
-					 roomObj.guides.authorizer.readLevel) ? roomObj.guides.authorizer.readLevel : "guest";
+					 roomObj.guides.authorizer.readLevel) ? roomObj.guides.authorizer.readLevel : "registered";
 
 	return (permissionWeights[this.getUserRole(userId, roomId)] >= permissionWeights[readLevel]);
 };
@@ -288,7 +288,7 @@ Store.prototype.isRoomReadable = function(roomId, userId) {
 Store.prototype.isRoomWritable = function(roomId, userId) {
 	var roomObj = this.getRoom(roomId),
 		writeLevel = (roomObj && roomObj.guides && roomObj.guides.authorizer &&
-					  roomObj.guides.authorizer.writeLevel) ? roomObj.guides.authorizer.writeLevel : "guest";
+					  roomObj.guides.authorizer.writeLevel) ? roomObj.guides.authorizer.writeLevel : "registered";
 
 	return (permissionWeights[this.getUserRole(userId, roomId)] >= permissionWeights[writeLevel]);
 };
@@ -301,7 +301,6 @@ module.exports = function(core, config) {
 	require("./rule-manager.es6")(core, config, store, state);
 	require("./socket.js")(core, config, store, state);
 	require("./session-manager.js")(core, config, store, state);
-	require("./guest-params-handler.js")(core, config, store, state);
 
 	return store;
 };

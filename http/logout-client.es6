@@ -8,7 +8,7 @@ module.exports = function(core, config, store) {
 	core.on("user-menu", menu => {
 		var user = store.get("user");
 
-		if (!user || userUtils.isGuest(store.get("user"))) {
+		if (!user) {
 			return;
 		}
 

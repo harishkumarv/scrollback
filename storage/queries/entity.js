@@ -27,15 +27,13 @@ module.exports = [
 
 		if (query.ref) {
 			if (Array.isArray(query.ref)) {
-				filters.push({ $: "entities.id IN ($(ids))", ids: query.ref.map(function (e){
-					return e.replace(/^guest-/,"");
-				})});
+				filters.push({ $: "entities.id IN ($(ids))", ids: query.ref});
 			} else if(/\*$/.test(query.ref)) {
 				orderBy = "id";
 				if(!query.limit || query.limit>10) query.limit = 10;
 				filters.push({ $: "entities.id like ${id}", id: query.ref.replace(/\**$/,"%") });
 			} else {
-				filters.push({ $: "entities.id=${id}", id: query.ref.replace(/^guest-/,"") });
+				filters.push({ $: "entities.id=${id}", id: query.ref });
 			}
 		}
 
@@ -117,20 +115,19 @@ module.exports = [
 		var results = [];
 		if (entities.length) {
 			entities.forEach(function(row) {
-				var identities = [], isGuest;
+				var identities = [];
 				log.d("row identity", row);
 				
 				if(row.identities) {
 					row.identities.forEach(function(identity) {
 						log.d("identity", identity);
-						if(identity.indexOf("guest") >=0) isGuest = true;
 						identities.push(identity[1]);
 					});
 				}
 				
 				log.d("row identity", identities, row);
 				var entity = {
-					id: isGuest?"guest-"+row.id:row.id,
+					id: row.id,
 					type: row.type,
 					createTime: (row.createtime ? row.createtime.getTime() : null),
 					description: row.description,

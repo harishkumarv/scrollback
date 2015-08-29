@@ -23,7 +23,7 @@ html
 									each m in l.interesting
 										tr: td(colspan="2" style="padding: 5px 20px 5px 40px;")
 											div(style="width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;")
-												span(style='color: #999') [#{m.from.replace("guest-", "")}]
+												span(style='color: #999') [#{m.from}]
 												span(style='color: #555') #{m.text}
 								tr: td(style="height: 10px;")
 

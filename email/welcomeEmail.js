@@ -48,7 +48,7 @@ function sendWelcomeEmail(user, origin) {
 
 function emailRoomListener(action, callback) {
 	log("user welcome email ", action);
-	if (userUtils.isGuest(action.from)) {
+	if (action.old) {
 		sendWelcomeEmail(action.user, action.origin);
 	}
 	

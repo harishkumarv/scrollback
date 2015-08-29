@@ -43,7 +43,7 @@ module.exports = function(core, config, store) {
 	function saveUser() {
 		var userObj = store.getUser(), uuid, key = "";
 
-		if (!userObj.id || userUtils.isGuest(userObj.id)) return;
+		if (!userObj || !userObj.id) return;
 
 		userObj = objUtils.clone(userObj);
 

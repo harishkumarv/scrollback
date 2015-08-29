@@ -136,7 +136,7 @@ var handlers = {
 module.exports = function() {
 	return function(action) {
 		if(!handlers[action.type]) return;
-		if (permissionWeights[action.user.role] <= permissionWeights.guest || permissionWeights[action.role] > permissionWeights.owner) {
+		if (permissionWeights[action.user.role] <= permissionWeights.registered || permissionWeights[action.role] > permissionWeights.owner) {
 			return (new SbError("ERR_NOT_ALLOWED", {
 				source: 'authorizer',
 				action: action.type,

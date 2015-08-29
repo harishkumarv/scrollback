@@ -16,7 +16,7 @@ module.exports = function(core, config, store) {
 
 		if (roomObj === "missing") {
 			changes.app.cta = null;
-		} else if (userId && !userUtils.isGuest(userId) && ((/(visitor|none)/).test(role) || !role) && (/(chat|room)/).test(mode) &&
+		} else if (userId && ((/(visitor|none)/).test(role) || !role) && (/(chat|room)/).test(mode) &&
 		    !(roomObj && roomObj.guides && roomObj.guides.authorizer && roomObj.guides.authorizer.openRoom === false)) {
 			changes.app.cta = "follow";
 		} else if (cta === "follow") {

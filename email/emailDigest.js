@@ -438,7 +438,7 @@ function getHeading(email) {
 	});
 	email.count = threadCount;
 	if (bestMention.mentions) {//if mentioned
-		heading += "[" + bestMention.from.replace(/guest-/g, "") +  "] " + bestMention.text + " - on " + bestMention.to;
+		heading += "[" + bestMention.from +  "] " + bestMention.text + " - on " + bestMention.to;
 	}
 	else {
 		var tail = (more > 1 ? " +" + (more - 1) + " more": "");

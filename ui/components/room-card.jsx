@@ -82,7 +82,7 @@ module.exports = function(core, config, store) {
 
 			icons.push(<a className="card-icon card-icon-share card-actions-item" key={"card-share-" + room} onClick={this.shareRoom}></a>);
 
-			if (user && !userUtils.isGuest(user)) {
+			if (user) {
 				if (rel && (/owner|moderator/).test(rel.role)) {
 					icons.push(<a data-state="online" className="card-icon card-icon-configure card-actions-item"
 					           key={"card-configure-" + room} onClick={this.showRoomSettings}></a>);

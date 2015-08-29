@@ -80,93 +80,11 @@ module.exports = function(core, config, store) {
 			}
 		}
 
-		if (typeof userChangeCallback === "function" && changes.user && userUtils.isGuest(store.get("user"))) {
+		if (typeof userChangeCallback === "function" && changes.user) {
 			userChangeCallback();
 			userChangeCallback = null;
 		}
 	}, 1);
-
-	core.on("createroom-dialog", function(dialog, next) {
-		var user = store.get("user"),
-			signingup = store.get("nav", "dialogState", "signingup"),
-			roomName = store.get("nav", "dialogState", "prefill") || "";
-
-		if (!user) {
-			return;
-		}
-
-		if (userUtils.isGuest(user)) {
-			if (signingup) {
-				dialog.title = "Create a new room";
-				dialog.content = [
-					"<p><b>Step 1:</b> Choose a username<input type='text' id='createroom-dialog-user' autofocus></p>",
-					"<p><b>Step 2:</b> Choose a room name<input type='text' id='createroom-dialog-room' value='" + roomName + "' autofocus></p>"
-				];
-				dialog.action = {
-					text: "Sign up & create room",
-					action: function() {
-						var $userEntry = $("#createroom-dialog-user"),
-							$roomEntry = $("#createroom-dialog-room"),
-							self = this;
-
-						$userEntry.validInput(function(username, callback) {
-							var roomname = $roomEntry.val();
-
-							roomname = (typeof roomname === "string") ? roomname.toLowerCase().trim() : "";
-							username = (typeof username === "string") ? username.toLowerCase().trim() : "";
-
-							if (!username) {
-								callback("User name cannot be empty");
-							} else if (username === roomname) {
-								callback("User and room names cannot be the same");
-							} else {
-								$roomEntry.validInput(function(name, cb) {
-									validateEntity("Room", name, function(res, message) {
-										if (res === "error") {
-											cb(message);
-										}
-
-										if (res === "ok") {
-											cb();
-
-											createAndValidate("user", $userEntry, self, function() {
-												createAndValidate("room", $roomEntry, self);
-											});
-										}
-									});
-								});
-							}
-						});
-					}
-				};
-			} else {
-				dialog.title = "Create a new room";
-				dialog.description = "<b>Step 1:</b> Sign in to scrollback";
-				dialog.content = [
-					"<b>Step 2:</b> Choose a room name",
-					"<input type='text' id='createroom-dialog-room' value='" + roomName + "' disabled>"
-				];
-
-				core.emit("auth", dialog, function() {
-					next();
-				});
-
-				return;
-			}
-		} else {
-			dialog.title = "Create a new room";
-			dialog.description = "Choose a room name";
-			dialog.content = [ "<input type='text' id='createroom-dialog-room' value='" + roomName + "' autofocus>" ];
-			dialog.action = {
-				text: "Create room",
-				action: function() {
-					createAndValidate("room", "#createroom-dialog-room", this);
-				}
-			};
-		}
-
-		next();
-	}, 100);
 
 	core.on("signup-dialog", function(dialog, next) {
 		var signingup = store.get("nav", "dialogState", "signingup");
@@ -214,7 +132,7 @@ module.exports = function(core, config, store) {
 			}
 		};
 
-		if (user && userUtils.isGuest(user)) {
+		if (user) {
 			core.emit("auth", dialog, function() {
 				next();
 			});

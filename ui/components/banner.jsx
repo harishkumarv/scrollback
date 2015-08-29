@@ -119,7 +119,7 @@ module.exports = function(core, config, store) {
 							action: this.showRoomSettings
 						} : null
 					});
-				} else if (mode === "home" && env !== "embed" && user && !userUtils.isGuest(user)) {
+				} else if (mode === "home" && user) {
 					userObj = store.getUser() || {};
 
 					this.setState({

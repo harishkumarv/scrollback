@@ -50,7 +50,10 @@ function sendQuery(query, next) {
 }
 
 function sendInit() {
-	core.emit("init-up", { id: generate.uid(), resource: generate.uid() });
+	core.emit("init-up", {
+		id: generate.uid(),
+		resource: generate.uid()
+	});
 }
 
 function receiveMessage(event) {
@@ -64,8 +67,12 @@ function receiveMessage(event) {
 
 	if (["getTexts", "getThreads", "getUsers", "getRooms", "getSessions", "getEntities", "upload/getPolicy", "getNotes", "error"].indexOf(data.type) !== -1) {
 		if (pendingQueries[data.id]) {
-			if (data.results) { pendingQueries[data.id].query.results = data.results; }
-			if (data.response) { pendingQueries[data.id].query.response = data.response; }
+			if (data.results) {
+				pendingQueries[data.id].query.results = data.results;
+			}
+			if (data.response) {
+				pendingQueries[data.id].query.response = data.response;
+			}
 
 			if (data.type === "error") {
 				pendingQueries[data.id](data);
@@ -106,7 +113,7 @@ function receiveMessage(event) {
 			}
 		}
 
-//		console.log(data.type+ "-dn", data);
+		//		console.log(data.type+ "-dn", data);
 		core.emit(data.type + "-dn", data);
 	}
 }
@@ -117,8 +124,10 @@ function disconnected() {
 
 	if (backOff === 1) {
 		core.emit("setstate", {
-			app: { connectionStatus: "offline" }
-		}, function(err) {
+			app: {
+				connectionStatus: "offline"
+			}
+		}, function (err) {
 			if (err) console.log(err.message);
 		});
 	}
@@ -137,7 +146,7 @@ function connect() {
 	client = new SockJS(config.server.protocol + "//" + config.server.apiHost + "/socket");
 	client.onclose = disconnected;
 
-	client.onopen = function() {
+	client.onopen = function () {
 		backOff = 1;
 		sendInit();
 	};
@@ -148,21 +157,21 @@ function connect() {
 window.addEventListener("offline", disconnected);
 window.addEventListener("online", connect);
 
-module.exports = function(c, conf, s) {
+module.exports = function (c, conf, s) {
 	core = c;
 	config = conf;
 	store = s;
 
 	connect();
 
-	[ "getTexts", "getUsers", "getRooms", "getThreads", "getEntities", "upload/getPolicy", "getNotes" ].forEach(function(e) {
-		core.on(e, function(q, n) {
+	["getTexts", "getUsers", "getRooms", "getThreads", "getEntities", "upload/getPolicy", "getNotes"].forEach(function (e) {
+		core.on(e, function (q, n) {
 			q.type = e;
 			var key = pending.generateKey(q);
 
 			if (currentQueries[key]) {
 				currentQueries[key].push({
-					query:q,
+					query: q,
 					next: n
 				});
 
@@ -170,7 +179,7 @@ module.exports = function(c, conf, s) {
 			}
 
 			function finishQuery(err) {
-				currentQueries[key].forEach(function(item, i) {
+				currentQueries[key].forEach(function (item, i) {
 					/*
 						When multiple queries have been aggregated, clones of the object
 						need to be sent as results to avoid the callbacks interfering with
@@ -183,14 +192,14 @@ module.exports = function(c, conf, s) {
 			}
 
 			currentQueries[key] = [{
-				query:q,
+				query: q,
 				next: n
 			}];
 
 			if (initDone) {
 				sendQuery(q, finishQuery);
 			} else {
-				queue.push(function() {
+				queue.push(function () {
 					sendQuery(q, finishQuery);
 				});
 			}
@@ -202,13 +211,13 @@ module.exports = function(c, conf, s) {
 		"text-up", "edit-up", "back-up", "away-up",
 		"join-up", "part-up", "admit-up", "expel-up",
 		"room-up", "note-up"
-	].forEach(function(event) {
-		core.on(event, function(action, next) {
+	].forEach(function (event) {
+		core.on(event, function (action, next) {
 			action.type = event.replace(/-up$/, "");
 			if (initDone) {
 				sendAction(action);
 			} else {
-				actionQueue.push(function() {
+				actionQueue.push(function () {
 					sendAction(action);
 				});
 			}
@@ -216,24 +225,19 @@ module.exports = function(c, conf, s) {
 		}, 1);
 	});
 
-	core.on("user-up", function(userUp, next) {
-		if (userUtils.isGuest(userUp.user.id)) {
-			next();
-			core.emit("user-dn", userUp);
+	core.on("user-up", function (userUp, next) {
+		userUp.type = "user";
+		if (initDone) {
+			sendAction(userUp);
 		} else {
-			userUp.type = "user";
-			if (initDone) {
+			actionQueue.push(function () {
 				sendAction(userUp);
-			} else {
-				actionQueue.push(function() {
-					sendAction(userUp);
-				});
-			}
-			next();
+			});
 		}
+		next();
 	}, 1);
 
-	core.on("init-up", function(init, next) {
+	core.on("init-up", function (init, next) {
 		if (!init.session) session = init.session = "web://" + generate.uid();
 
 		init.type = "init";
@@ -241,7 +245,7 @@ module.exports = function(c, conf, s) {
 
 		client.send(JSON.stringify(init));
 
-		pendingActions[init.id] = function(action) {
+		pendingActions[init.id] = function (action) {
 			if (action.type === "init") {
 				initDone = true;
 				while (queue.length) {
@@ -259,7 +263,7 @@ module.exports = function(c, conf, s) {
 		next();
 	}, 1);
 
-	core.on("statechange", function(changes, next) {
+	core.on("statechange", function (changes, next) {
 		if (changes.app && changes.app.connectionStatus === "online") {
 			initDone = true;
 			while (queue.length) {

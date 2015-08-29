@@ -29,7 +29,6 @@ function onAway(action, callback) {
 		occupantDB.scard("user:{{" + action.from + "}}:occupantOf", function(error, data) {
 			if (!data) {
 				occupantDB.del("user:{{" + action.from + "}}:occupantOf");
-				if (userOps.isGuest(action.user.id)) action.deleteGuestNow = true;
 			}
 			callback();
 		});
