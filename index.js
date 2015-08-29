@@ -20,9 +20,8 @@ Boston, MA 02111-1307 USA.
 
 "use strict";
 
-var plugins = [ "validator", "browserid-auth", "facebook", "featured", "anti-abuse",
-				"threader", "thread-color", "notability", "authorizer", "redis-storage", "storage",
-				"entityloader", "irc", "twitter", "jws", "censor", "email", "superuser", "sitemap",
+var plugins = [ "validator", "facebook", "anti-abuse", "notability", "authorizer", "redis-storage", "storage",
+				"entityloader", "censor", "email", "sitemap",
 				"push-notification", "google", "upload" ],
 	appPriorities = { // don't override
 		antiflood: 1000,

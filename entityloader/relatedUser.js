@@ -56,32 +56,27 @@ function loadRelatedUser(room, user, session, callback) {
 		} else {
 			returnValue = data.results[0];
 			if (!room) return done();
-			if (userUtils.isGuest(returnValue.id)) {
-				returnValue.role = "guest";
-				done();
-			} else {
-				core.emit("getUsers", {
-					session: "internal-loader",
-					ref: returnValue.id,
-					memberOf: room
-				}, function(memberErr, relations) {
-					if (memberErr) {
-						if (memberErr.message === "NO_ROOM_WITH_GIVEN_ID") {
-							returnValue.role = "registered";
-							return done();
-						} else {
-							return done(memberErr);
-						}
-					}
-					if (!relations || !relations.results || !relations.results.length) {
+			core.emit("getUsers", {
+				session: "internal-loader",
+				ref: returnValue.id,
+				memberOf: room
+			}, function(memberErr, relations) {
+				if (memberErr) {
+					if (memberErr.message === "NO_ROOM_WITH_GIVEN_ID") {
 						returnValue.role = "registered";
-						done();
+						return done();
 					} else {
-						returnValue = relations.results[0];
-						done();
+						return done(memberErr);
 					}
-				});
-			}
+				}
+				if (!relations || !relations.results || !relations.results.length) {
+					returnValue.role = "registered";
+					done();
+				} else {
+					returnValue = relations.results[0];
+					done();
+				}
+			});
 		}
 	});
 

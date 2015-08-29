@@ -5,16 +5,20 @@ var log = require('../lib/logger.js');
 
 
 function generateMentions(action, next) {
-	var members = action.members, occupants = action.occupants;
-	var users = members.concat(occupants), candidates = {}, mentions;
-	if(!action.text) return next();
-	users.forEach(function(u) {
-		if(u.id === action.user.id) return;
-		if (userUtils.isGuest(u.id)) candidates[u.id.replace(/^guest-/, '')] = true;
-		else candidates[u.id] = true;
+	var members = action.members,
+		occupants = action.occupants;
+	var users = members.concat(occupants),
+		mentions;
+	if (!action.text) return next();
+
+
+	users = users.map(function(user) {
+		return user.id;
+	}).filter(function(user) {
+		if (user.id === action.user.id) return false;
+		else true;
 	});
 
-	users = Object.keys(candidates);
 	mentions = action.text.split(" ").map(function(word) {
 		if (((/^@[a-z][a-z0-9\_\-\(\)]{2,32}[:,]?$/i).test(word) || (/^[a-z][a-z0-9\_\-\(\)]{2,32}:$/i).test(word)) && _.contains(users, word.replace(/[@:]/, ''))) {
 			return word.replace(/[@:]/, '');
