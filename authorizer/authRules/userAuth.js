@@ -29,19 +29,7 @@ module.exports = function (core) {
 			delete action.user.role;
 			return callback();
 		} else if (action.user.role === "none") {
-			if (/^guest-/.test(action.user.id)) {
-				action.user.role = "guest";
-			} else {
-				action.user.role = "registered";
-			}
-		}
-		if (action.user.role === "guest") {
-			return callback(new SbError('ERR_NOT_ALLOWED', {
-				source: 'authorizer',
-				action: 'user',
-				requiredRole: 'registered',
-				currentRole: action.user.role
-			}));
+			action.user.role = "registered";
 		}
 
 		if (!action.old || !action.old.id) {

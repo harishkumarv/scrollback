@@ -35,7 +35,6 @@ window.store = store = require("./../store/store.js")(core, config);
 let args = [ core, config, store ];
 
 // Trunks
-require("../widget/widget-client.es6")(...args);
 require("../history/history-client.js")(...args);
 
 // Apps

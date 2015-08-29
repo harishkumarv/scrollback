@@ -178,33 +178,6 @@ gulp.task("bundle", () =>
 		.pipe(gulp.dest(dirs.scripts)))
 );
 
-// Generate embed widget script
-gulp.task("embed:v1", () =>
-	bundle("widget/sdk/v1.js", {
-		transform: [ babelify, optional ]
-	}, bundled => bundled
-		.pipe(sourcemaps.init({ loadMaps: true }))
-		.pipe(buildscripts())
-		.pipe(rename("client.min.js"))
-		.pipe(sourcemaps.write("."))
-		.pipe(gulp.dest("public")))
-);
-
-gulp.task("embed:v2", () =>
-	bundle("widget/sdk/v2.js", {
-		transform: [ babelify, optional ]
-	}, bundled => bundled
-		.pipe(sourcemaps.init({ loadMaps: true }))
-		.pipe(buildscripts())
-		.pipe(rename("sb.js"))
-		.pipe(sourcemaps.write("."))
-		.pipe(gulp.dest("public/s")))
-);
-
-gulp.task("embed", [ "embed:v1", "embed:v2" ]);
-
-// Generate scripts
-gulp.task("scripts", [ "bundle", "embed" ]);
 
 gulp.task("scripts:watch", () => {
 	bundle.watch = true;
